@@ -3,7 +3,21 @@ var express = require('express');
 var app = express();
 
 // --> 7)  Mount the Logger middleware here
+app.use(function(req, res, next) {
+  console.log(req.method + " " + req.path + " - " + req.ip)
 
+  next()
+});
+
+app.get('/now', function(req, res, next) {
+  req.time = new Date().toString();
+  
+  next()
+}, function(req,res) {
+  let responseData = {"time" : req.time}
+  
+  res.json(responseData);
+})
 
 // --> 11)  Mount the body-parser middleware  here
 
@@ -24,7 +38,7 @@ app.get('/', function(req, res){
 })  
 
 /** 4) Serve static assets  */
-// app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
 
 /** 5) serve JSON on a specific route */
@@ -32,23 +46,33 @@ app.get('/', function(req, res){
 
 /** 6) Use the .env file to configure the app */
 
-app.get('/json', (req, res) => {
-  let data = {"message": "Hello json"};
-  if(process.env.MESSAGE_STYLE === 'uppercase'){
-    data.message = data.message.toUpperCase();
-  }
-  res.json(data);
-});
+// app.get('/json', (req, res) => {
+//   let data = {"message": "Hello json"};
+//   if(process.env.MESSAGE_STYLE === 'uppercase'){
+//     data.message = data.message.toUpperCase();
+//   }
+//   res.json(data);
+// });
  
 /** 7) Root-level Middleware - A logger */
 //  place it before all the routes !
 
 
-/** 8) Chaining middleware. A Time server */
 
+
+/** 8) Chaining middleware. A Time server */
+app.get('/now', function(req, res, next) {
+    req.time = new Date().toString();
+    const responseData = {"time" : req.time}
+    console.log(responseData);
+  
+  next()
+})
 
 /** 9)  Get input from client - Route parameters */
-
+app.get('/:word/echo', function(req, res, next) {
+  
+})
 
 /** 10) Get input from client - Query parameters */
 // /name?first=<firstname>&last=<lastname>
